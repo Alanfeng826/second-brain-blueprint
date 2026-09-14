@@ -1,0 +1,27 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# 知识库运行产物（不要把真实 Vault 提交进本仓库）
+_tmp*
+_gen_*
+_manual*
+_docx_build/
+output/
+*.tmp
+*.log
+
+# 本地配置
+.env
+.env.local
+*.local.json
+
+# Node（若你 fork 后加了前端）
+node_modules/
+dist/
