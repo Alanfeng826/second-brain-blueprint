@@ -88,8 +88,11 @@ Vault 根目录会有大量非知识文件（构建目录、临时脚本、日�
 写进 `.env` 一条逗号分隔的排除串：
 
 ```text
-LAO_FENG_EXCLUDES=_tmp*,_gen_*,_manual*,_docx_build,output,*.html,*.htm,*.tmp,*.log
+VAULT_EXCLUDES=_tmp*,_gen_*,_manual*,_docx_build,output,*.html,*.htm,*.tmp,*.log
 ```
+
+> 上游默认只有一份写死的目录黑名单（`EXCLUDED_DIRECTORIES`），**没有可配置的排除变量**。
+> 上面这行是本方法新增的：把黑名单外置成环境变量，好处是切 Vault / 临时产物变多时不用改源码。
 
 排除规则要支持三种 pattern：
 
