@@ -1,0 +1,18 @@
+# 行尾统一。
+#
+# 为什么需要：workbench-kit/scripts/ 下的 .bat / .vbs 是 Windows 专用入口，
+# 而这些脚本在 LF 行尾下会出问题（见 docs/05 踩坑 D11）。若不显式声明，
+# 在 macOS / Linux 上 clone 会拿到 LF 版本，交到 Windows 用户手里就跑不起来。
+#
+# text=auto：其余文本按仓库统一 LF；下面按扩展名把 Windows 脚本钉成 CRLF。
+
+* text=auto eol=lf
+
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.vbs  text eol=crlf
+
+# 图片/二进制，别做任何行尾转换
+*.png  binary
+*.jpg  binary
+*.ico  binary
