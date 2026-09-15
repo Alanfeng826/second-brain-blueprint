@@ -1,0 +1,52 @@
+{
+  "_comment": "Workbench 的 Vault 映射配置。复制为 vault-map.json 放在 Workbench/ 目录下。section 必须是上游已有的视图名，不要发明新的。",
+  "libraries": [
+    {
+      "dir": "工作项目库",
+      "layer": "wiki",
+      "section": "cases",
+      "kind": "knowledge",
+      "overrides": [
+        {
+          "_comment": "长期课题类子目录按 analyses 走，因为它跟踪的是策略而不是单个案例",
+          "second": "示例-长期课题",
+          "section": "analyses",
+          "kind": "knowledge"
+        }
+      ]
+    },
+    {
+      "dir": "学习成长库",
+      "layer": "wiki",
+      "section": "concepts",
+      "kind": "knowledge",
+      "overrides": [
+        {
+          "_comment": "备考类子目录当 frameworks 更合适：里面是方法论笔记，不是概念卡",
+          "secondPrefix": "备考-",
+          "section": "frameworks",
+          "kind": "knowledge"
+        }
+      ]
+    },
+    {
+      "dir": "产品洞察库",
+      "layer": "wiki",
+      "section": "analyses",
+      "kind": "knowledge"
+    },
+    {
+      "dir": "素材模板库",
+      "layer": "wiki",
+      "section": "templates",
+      "kind": "template"
+    },
+    {
+      "_comment": "_系统 放标签体系、全局提示词等元文件。归到 usage，免得它挤占案例列表",
+      "dir": "_系统",
+      "layer": "wiki",
+      "section": "usage",
+      "kind": "usage"
+    }
+  ]
+}

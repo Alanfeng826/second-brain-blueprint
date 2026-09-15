@@ -119,7 +119,20 @@
 ### 阶段 5：接门面（可选，一天）
 用开源前端把 Vault 可视化：总览、搜索、知识星图、阅读器、**文件一改页面半秒内自动更新**。
 
-> 详细步骤见 [`docs/03-门面-Workbench接入.md`](docs/03-门面-Workbench接入.md)
+本仓库带一个安装器，一条命令完成接线（拉上游 → 打适配补丁 → 生成配置 → 装依赖）：
+
+```bash
+node workbench-kit/bootstrap.mjs --vault D:/your-vault
+```
+
+装完只需改一处：`Workbench/vault-map.json` 里的库目录名。
+
+> 原理见 [`docs/03-门面-Workbench接入.md`](docs/03-门面-Workbench接入.md)，
+> 安装器说明见 [`workbench-kit/README.md`](workbench-kit/README.md)。
+>
+> **为什么不把前端源码直接放进本仓库**：上游是第三方项目（有自己的许可证），
+> 复制进来会让许可边界变糊，也会变成一份不跟随上游升级的旧快照。
+> 所以这里只放"接线"所需的部分，上游代码在安装时按 commit 拉取。
 
 ---
 
@@ -165,6 +178,7 @@ your-vault/
 | [docs/05-踩坑清单.md](docs/05-踩坑清单.md) | 全部实战踩过的坑与解法 |
 | [docs/06-模板设计要点.md](docs/06-模板设计要点.md) | 为什么模板要这么写 |
 | [templates/](templates/) | 可直接复制的系统文档与库说明 |
+| [workbench-kit/](workbench-kit/) | 门面安装器：一条命令把上游前端接到你的 Vault（不含上游源码） |
 | [scripts/kb-stats.ps1](scripts/kb-stats.ps1) | 知识库体积诊断脚本 |
 
 ---
@@ -183,6 +197,9 @@ your-vault/
 | 6 | 目录移动类命令，无通配符时取到的是"目录内容"而非"目录本身" | 用 `path\*` 让通配符展开 |
 | 7 | 前端端口被占后**静默漂移**，用户访问原端口打不开 | 锁定端口 ＋ `strictPort` |
 | 8 | 改了后端平台分支，忘了前端文案（"在 Finder 中显示"） | 交付前做一次"能用的功能 + 错的提示"自查 |
+| 9 | 用 `/api/collections/wiki?section=X` 验证前端分类 | 该接口**忽略** `section` 参数，永远返回全量 —— "验证通过"是假象；改用 `/api/search?q=...&section=X` |
+| 10 | 适配层兜底路径依赖 `process.cwd()` | 工作目录一变就**静默**退回默认映射：页面能开、分类全错；改用模块自身位置推导 |
+| 11 | 启动器改了端口却没告诉 vite | 服务起来了启动器却报超时；端口要同时给探测逻辑和 `vite --port --strictPort` |
 
 ---
 

@@ -9,6 +9,28 @@
 
 ---
 
+## 0. 懒人路径：一条命令装好
+
+下面 §1–§7 讲的是**原理**，读一遍能让你在出问题时知道该动哪里。
+如果你只想先把东西跑起来，用本仓库的安装器：
+
+```bash
+git clone https://github.com/Alanfeng826/second-brain-blueprint.git
+node second-brain-blueprint/workbench-kit/bootstrap.mjs --vault D:/your-vault
+```
+
+它会（全部幂等，可重复执行）：拉上游并切到**已验证的 commit** → 装脚本 →
+装适配模块 → 按锚点给上游 2 个文件打 6 处补丁 → 生成 `.env` 与 `vault-map.json` → `npm install`。
+
+装完只剩一件事要手工做：编辑 `Workbench/vault-map.json`，把 `libraries[].dir`
+改成你自己的库目录名。**它不写你的 Vault，只读。**
+
+> 本仓库**不包含**上游源码 —— 上游是第三方项目，直接复制会让许可边界变糊、
+> 也会变成一份没人跟着升级的旧快照。安装器只带"接线"所需的部分。
+> 细节见 [`workbench-kit/README.md`](../workbench-kit/README.md)。
+
+---
+
 ## 1. 先理解它的读取链路
 
 ```
@@ -104,8 +126,13 @@ VAULT_EXCLUDES=_tmp*,_gen_*,_manual*,_docx_build,output,*.html,*.htm,*.tmp,*.log
 
 **坑**：前缀排除必须在"文件分支"也检查一次，否则顶层的 `_tmp_xxx.md`（文件，不是目录）会漏网。
 
+**坑**：排除规则只在接线时初始化一次的话，hook 锚点漂移或调用顺序一变，就会静默
+"一条都不排除" —— 不报错、页面上看不出来，只是临时产物又回到列表里。
+判断函数应当**自愈**：第一次被调用时若还没初始化，就地按环境变量初始化。
+
 **更好的做法**：不要只在运行时排除，**接入时先做一次镜像**（只复制要索引的文件到沙箱目录）。
 这样文件复制成本也省了，而且排除规则变了之后镜像可重建。
+（但注意 §4 的结论：镜像 = 快照，**不跟随实时更新**，除非你要的就是隐私隔离。）
 
 ---
 
@@ -190,6 +217,8 @@ Get-CimInstance Win32_Process -Filter "ProcessId=<pid>" | Select ProcessId,Paren
 | 知识星图为空 | 你写的是普通正文，没有 `[[xxx]]` 双链。星图依赖双链，不依赖目录 |
 | 隐私扫描不通过 | 公共仓库的隐私门禁会拒绝真实路径/客户名。私有使用可跳过，公开分享必须先过 |
 | 某些页面数据缺失 | 上游页面期待特定字段契约，你的数据没有就是没有 —— **不要用 0 或假数据顶替** |
+| `/api/runtime` 里 `errors` 不为 0 | 多半是上游自带数据源（如它自己的 `10_raw/douyin/...`）在你这里不存在，会在 `qualityNotices` 里说明。**与你的 Vault 无关**，不影响四库视图 |
+| `metrics.wiki` 与 `documents` 数量对不上 | 上游对"什么算 wiki 文档"有自己的口径，你的元文件（如 `_系统/索引.md`）可能不计入。以页面实际显示为准 |
 
 ---
 
@@ -197,7 +226,9 @@ Get-CimInstance Win32_Process -Filter "ProcessId=<pid>" | Select ProcessId,Paren
 
 - [ ] `.env` 的根目录指向真实 Vault，且**完全重启**过 dev server
 - [ ] `/api/runtime` 显示的是你的 Vault，不是 demo
-- [ ] 四库 → section 映射已生效（`/api/collections/wiki?section=...` 能返回真实文档）
+- [ ] 四库 → section 映射已生效 —— 用 `/api/search?q=<能命中内容的词>&section=<视图名>` 逐库抽查
+      （⚠️ **不要**用 `/api/collections/wiki?section=...` 验证：该接口忽略 `section` 参数，永远返回全量，
+      "有数据"是假象）
 - [ ] 标签块 → frontmatter 提取生效（前端能看到你正文里的标签）
 - [ ] 排除规则覆盖全部临时产物（顶层散落的 `_tmp_*.md` 也要覆盖）
 - [ ] 独立启动器可用，`--status` 显示正常
